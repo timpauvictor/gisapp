@@ -6,6 +6,9 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <link rel="stylesheet" href="https://code.getmdl.io/1.1.1/material.green-orange.min.css" />
+<link rel="stylesheet" href="./styles/easy-button.css" />
+<link rel="stylesheet" href="./styles/largerIon.css"/>
+<link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" />
 <script defer src="https://code.getmdl.io/1.1.1/material.min.js"></script>
 		<meta charset="utf-8">
 			<title>2016 ECCE App Challenge</title>
@@ -19,7 +22,7 @@
 	<body>
 		<!-- Accent-colored raised button with ripple -->
 		<!-- Always shows a header, even in smaller screens. -->
-<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--fixed-drawer">
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout">
   <header class="mdl-layout__header">
     <div class="mdl-layout__header-row">
       <!-- Title -->
@@ -55,12 +58,15 @@
   </div>
   <main class="mdl-layout__content">
     <div class="page-content">
-    <div id="map" style="position: absolute; top:0; bottom:0; right:0; left:0;"></div> 
+    <div id="map" style="position: absolute; top:0; bottom:0; right:0; left:0;">
+      
+    </div> 
     	 
     <!-- Load ERSI Leaflet from CDN-->
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v1.0.0-beta.2/leaflet.css" />
     <script src="http://cdn.leafletjs.com/leaflet/v1.0.0-beta.2/leaflet.js"></script>
     <script src="//cdn.jsdelivr.net/leaflet.esri/2.0.0-beta.7/esri-leaflet.js"></script>
+    <script src="./js/easy-button.js"></script>
     <script src="./js/catiline.js"></script>
     <script src="./js/leaflet.shpfile.js"></script>
     <script src="./js/shp.js"></script>

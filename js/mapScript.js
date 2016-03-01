@@ -3,6 +3,7 @@ var __zoomLevel = 12;
 var __map;
 var __shapeLayers = [];
 var __activatedLayers = [];
+var __customMarkers = {};
 
 function loadMap() {
 	__map = L.map("map").setView(__startingCoords, __zoomLevel);
@@ -50,6 +51,29 @@ function clearAllLayers() {
 	}
 }
 
+function findMe() {
+	if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition(showPosition);
+	} else {
+		//show a search bar
+	}
+}
+
+function showPosition(position) {
+	if (__customMarkers["geolocation"] != undefined) {
+		__map.removeLayer(__customMarkers["geolocation"]);
+	}
+	var marker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(__map);
+	__customMarkers["geolocation"] = marker;
+	__map.setView([position.coords.latitude, position.coords.longitude], 18);	
+}
+
+function addFindMeButton() {
+	L.easyButton( 'icon ion-android-locate larger',function() {
+		findMe();
+	}).addTo(__map);
+}
+
 
 function mainRunner() {
 	loadMap(); //loads map and adds it to div
@@ -57,6 +81,8 @@ function mainRunner() {
 	addShapeFile("../data/LeafYardServices.zip");
 	addShapeFile("../data/Recycling.zip");
 	// setTimeout({ __map.invalidateSize() }, 500);
+	addFindMeButton();
+
 }
 
 mainRunner();
