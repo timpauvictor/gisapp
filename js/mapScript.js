@@ -85,24 +85,23 @@ function clearAllLayers() {
 
 function findMe() {
 	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(showPosition);
+		navigator.geolocation.getCurrentPosition(function(position) {
+			if (__customMarkers[0] != undefined) {
+				__map.removeLayer(__customMarkers[0]);
+			}
+			var marker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(__map);
+			__customMarkers[0] = marker;
+			__map.setView([position.coords.latitude, position.coords.longitude], 18);	
+		});
 	} else {
 		//show a search bar
 	}
 }
 
-function showPosition(position) {
-	if (__customMarkers["geolocation"] != undefined) {
-		__map.removeLayer(__customMarkers[0]);
-	}
-	var marker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(__map);
-	__customMarkers[0] = marker;
-	__map.setView([position.coords.latitude, position.coords.longitude], 18);	
-}
-
 function addFindMeButton() {
 	L.easyButton( 'icon ion-android-locate larger',function() {
 		findMe();
+
 	},
 	"Find my location").addTo(__map);
 }
