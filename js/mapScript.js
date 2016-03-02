@@ -17,7 +17,6 @@ function addPolygonShapeFile(path) { //generic function to add shapeFiles to the
 	var shpfile = new L.Shapefile(path, {
 		onEachFeature: function(feature, layer) {
 			if (feature.properties) {
-				console.log(feature);
 				layer.bindPopup(Object.keys(feature.properties).map(function(k) {
 						return k + ": " + feature.properties[k];
 					}).join("<br />"), {
@@ -41,7 +40,7 @@ function addMarkerShapeFile(path) { //generic function to add shapeFiles to the 
 	var shpfile = new L.Shapefile(path, {
 		onEachFeature: function(feature, layer) {
 			if (feature.properties) {
-				console.log(feature);
+				console.log(feature.geometry);
 				layer.bindPopup(Object.keys(feature.properties).map(function(k) {
 						return k + ": " + feature.properties[k];
 					}).join("<br />"), {
@@ -56,7 +55,6 @@ function addMarkerShapeFile(path) { //generic function to add shapeFiles to the 
 								// the tiles don't load properly
 	});
 	__shapeLayers.push(shpfile);
-	// console.log(shpfile.attribute('alt'));
 	__activatedLayers.push(false);
 }
 
@@ -90,6 +88,7 @@ function findMe() {
 				__map.removeLayer(__customMarkers[0]);
 			}
 			var marker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(__map);
+			marker.bindPopup(); //TODO: fill this in
 			__customMarkers[0] = marker;
 			__map.setView([position.coords.latitude, position.coords.longitude], 18);	
 		});
@@ -101,7 +100,6 @@ function findMe() {
 function addFindMeButton() {
 	L.easyButton( 'icon ion-android-locate larger',function() {
 		findMe();
-
 	},
 	"Find my location").addTo(__map);
 }
@@ -122,10 +120,14 @@ function addPrivateRecyclingButton() {
 
 function mapSetup() {
 	loadMap(); //loads map and adds it to div
-	addPolygonShapeFile("../data/wasteday.zip");
-	addPolygonShapeFile("../data/LeafYardServices.zip");
-	addMarkerShapeFile("../data/municipal.zip");
-	addMarkerShapeFile("../data/private.zip");
+
+	//load out shapefiles
+	addPolygonShapeFile("../data/wasteday.zip"); //layer 0
+	addPolygonShapeFile("../data/LeafYardServices.zip"); //layer 1
+	addMarkerShapeFile("../data/municipal.zip"); //layer 2
+	addMarkerShapeFile("../data/private.zip"); //layer 3
+
+	//load our buttons
 	addFindMeButton();
 	addPrivateRecyclingButton();
 	addMunicipalRecyclingButton();
