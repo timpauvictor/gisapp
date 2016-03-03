@@ -97,10 +97,7 @@ function findMe() {
                 __map.removeLayer(geolocation);
             }
             var marker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(__map);
-            marker.bindPopup("<b><center>This is you!</center></b><br> The <b>nearest private</b> recycling location is " + findNearestMarker(position, privateMarkers)
-            	+ "The <b>nearest municipal</b> recycling location is " + findNearestMarker(position, municipalMarkers)
-            	+ "The <b>nearest landfill</b> location is " + findNearestMarker(position, landfillMarkers)
-            	+ "The <b>nearest compost</b> location is " + findNearestMarker(position, compostMarkers));
+            marker.bindPopup("<b><center>This is you!</center></b><br> The <b>nearest private</b> recycling location is " + findNearestMarker(position, privateMarkers) + "The <b>nearest municipal</b> recycling location is " + findNearestMarker(position, municipalMarkers) + "The <b>nearest landfill</b> location is " + findNearestMarker(position, landfillMarkers) + "The <b>nearest compost</b> location is " + findNearestMarker(position, compostMarkers));
             // marker.openPopup();
             geolocation = marker;
             __map.setView([position.coords.latitude, position.coords.longitude], 18);
@@ -151,18 +148,18 @@ function toRad(value) {
 }
 
 function getDistance(pos1, pos2) { //using the haversine formula!
-	//it might not be the closest to drive to, but whatever
+    //it might not be the closest to drive to, but whatever
     var R = 6371000; // metres, earth's distance
     var p1 = toRad(pos1[0]);
     var p2 = toRad(pos2[0]);
-    var deltaP = toRad(pos2[0]-pos1[0]);
-    var deltaL = toRad(pos2[1]-pos1[1]);
+    var deltaP = toRad(pos2[0] - pos1[0]);
+    var deltaL = toRad(pos2[1] - pos1[1]);
 
-    var a = Math.sin(deltaP/2) * Math.sin(deltaP/2) +
-    		Math.cos(p1) * Math.cos(p2) *
-    		Math.sin(deltaL/2) * Math.sin(deltaL/2);
+    var a = Math.sin(deltaP / 2) * Math.sin(deltaP / 2) +
+        Math.cos(p1) * Math.cos(p2) *
+        Math.sin(deltaL / 2) * Math.sin(deltaL / 2);
 
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     var d = R * c;
     return d;
@@ -185,32 +182,45 @@ function findNearestMarker(position, featureArr) {
     var nearestName = "";
     // console.log(featureArr[lowestIndex].);
     if (featureArr[lowestIndex].properties.Name) {
-    	nearestName = featureArr[lowestIndex].properties.Name;
+        nearestName = featureArr[lowestIndex].properties.Name;
     } else {
-    	nearestName = "Nameless";
+        nearestName = "Nameless";
     }
-    
+
     var nearestAddress = featureArr[lowestIndex].properties.Address;
     var nearestAddressHREF = "";
     return nearestName + " at " + nearestAddress + "<br>";
 }
 
 function onMapClick(e) {
-	// console.log(e);
-	var popup = L.popup();
-	popup.setLatLng(e.latlng);
-	var position = { //this is hideous oh my god
-		coords: {
-			latitude: e.latlng.lat,
-			longitude: e.latlng.lng
-		}
-	}
-	// console.log(position);
-	popup.setContent("<b><center>This is your custom waypoint!</center></b><br> The <b>nearest private</b> recycling location is " + findNearestMarker(position, privateMarkers)
-            	+ "The <b>nearest municipal</b> recycling location is " + findNearestMarker(position, municipalMarkers)
-            	+ "The <b>nearest landfill</b> location is " + findNearestMarker(position, landfillMarkers)
-            	+ "The <b>nearest compost</b> location is " + findNearestMarker(position, compostMarkers));
-	popup.openOn(__map);
+    if (__activatedLayers[0] || __activatedLayers[1]) {
+        //TODO SHOW ERROR
+        var snackbarContainer = document.querySelector('#error-toast');
+        var innerMessage = "";
+        if (__activatedLayers[0]) {
+        	innerMessage = "Oops! Turn off Garbage Pickup Days overlay via the side menu before making a custom marker!";
+        } else if (__activatedLayers[1]) {
+        	innerMessage = "Oops! Turn off Leaf and Yard Services overlay via the side menu before making a custom marker!";
+        } else {
+        	innerMessage = "Some error occured";
+        }
+        var data = {
+        	message: innerMessage
+        }
+        snackbarContainer.MaterialSnackbar.showSnackbar(data);
+    } else {
+        var popup = L.popup();
+        popup.setLatLng(e.latlng);
+        var position = { //this is hideous oh my god but i didn't want to rewrite code so whatever it works
+                coords: {
+                    latitude: e.latlng.lat,
+                    longitude: e.latlng.lng
+                }
+            }
+            // console.log(position);
+        popup.setContent("<b><center>This is your custom waypoint!</center></b><br> The <b>nearest private</b> recycling location is " + findNearestMarker(position, privateMarkers) + "The <b>nearest municipal</b> recycling location is " + findNearestMarker(position, municipalMarkers) + "The <b>nearest landfill</b> location is " + findNearestMarker(position, landfillMarkers) + "The <b>nearest compost</b> location is " + findNearestMarker(position, compostMarkers));
+        popup.openOn(__map);
+    }
 }
 
 

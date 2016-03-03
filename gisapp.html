@@ -55,7 +55,7 @@
             </div>
         </header>
         <div class="mdl-layout__drawer">
-            <span class="mdl-layout-title">Other Layers</span>
+            <span class="mdl-layout-title">Overlays</span>
             <nav class="mdl-navigation">
                 <a class="mdl-navigation__link" onclick="toggleLayer(0)" href="javascript:void(0)">
         Garbage Pickup Days
@@ -71,6 +71,10 @@
         <main class="mdl-layout__content">
             <div class="page-content">
                 <div id="map" style="position: absolute; top:0; bottom:0; right:0; left:0;">
+                </div>
+                <div id="error-toast" class="mdl-js-snackbar mdl-snackbar">
+                    <div class="mdl-snackbar__text"></div>
+                    <button class="mdl-snackbar__action" type="button"></button>
                 </div>
                 <!-- Load ERSI Leaflet from CDN-->
                 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v1.0.0-beta.2/leaflet.css" />
