@@ -3,7 +3,11 @@ var __zoomLevel = 12;
 var __map;
 var __shapeLayers = [];
 var __activatedLayers = [];
-var __customMarkers = []; //0 is always our current location as long as we have it
+var compostMarkers = [];
+var landfillMarkers = [];
+var municipalMarkers = [];
+var privateMarkers = [];
+var geolocation = undefined;
 
 function loadMap() {
 	__map = L.map("map").setView(__startingCoords, __zoomLevel);
@@ -35,12 +39,16 @@ function addPolygonShapeFile(path) { //generic function to add shapeFiles to the
 	__activatedLayers.push(false);
 }
 
-function addMarkerShapeFile(path) { //generic function to add shapeFiles to the map, then stores the added shpfile object in an array
+function addMarkerShapeFile(path, arr) { //generic function to add shapeFiles to the map, then stores the added shpfile object in an array
 	console.log("attempting to load shapefile from " + path);
 	var shpfile = new L.Shapefile(path, {
 		onEachFeature: function(feature, layer) {
 			if (feature.properties) {
-				console.log(feature.geometry);
+				// if (feature.properties.Hours) {
+				// 	feature.properties.Hours.replace(/â/g, "-");
+				// 	console.log(feature.properties.Hours.search(/â/));
+				// }
+				arr.push(feature);
 				layer.bindPopup(Object.keys(feature.properties).map(function(k) {
 						return k + ": " + feature.properties[k];
 					}).join("<br />"), {
@@ -60,7 +68,7 @@ function addMarkerShapeFile(path) { //generic function to add shapeFiles to the 
 
 
 function toggleLayer(index) {
-	if (__customMarkers[0] != undefined) {
+	if (geolocation != undefined) {
 		__map.removeLayer(__customMarkers[0]);
 	} else {
 		//do nothing
@@ -118,19 +126,39 @@ function addPrivateRecyclingButton() {
 	"Display private recycling locations").addTo(__map);
 }
 
+function addCompostButton() {
+	L.easyButton("icon ion-leaf larger", function() {
+		toggleLayer(4);
+	},
+	"Display composting facility locations").addTo(__map);
+}
+
+function addLandFillButton() {
+	L.easyButton("icon ion-android-delete larger", function() {
+		toggleLayer(5);
+	},
+	"Display landfill locations").addTo(__map);
+}
+
 function mapSetup() {
 	loadMap(); //loads map and adds it to div
 
 	//load out shapefiles
 	addPolygonShapeFile("../data/wasteday.zip"); //layer 0
 	addPolygonShapeFile("../data/LeafYardServices.zip"); //layer 1
-	addMarkerShapeFile("../data/municipal.zip"); //layer 2
-	addMarkerShapeFile("../data/private.zip"); //layer 3
+	addMarkerShapeFile("../data/municipal.zip", municipalMarkers); //layer 2
+	addMarkerShapeFile("../data/private.zip", privateMarkers); //layer 3
+	addMarkerShapeFile("../data/composting_facilities.zip", compostMarkers); //layer 4
+	addMarkerShapeFile("../data/landfills.zip", landfillMarkers); //layer 5
 
 	//load our buttons
 	addFindMeButton();
 	addPrivateRecyclingButton();
 	addMunicipalRecyclingButton();
+	addCompostButton();
+	addLandFillButton();
+
+	
 
 }
 

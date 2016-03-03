@@ -7,8 +7,9 @@
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <link rel="stylesheet" href="https://code.getmdl.io/1.1.1/material.green-orange.min.css" />
 <link rel="stylesheet" href="./styles/easy-button.css" />
-<link rel="stylesheet" href="./styles/largerIon.css"/>
+<link rel="stylesheet" href="./styles/myStyles.css"/>
 <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" />
+<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
 <script defer src="https://code.getmdl.io/1.1.1/material.min.js"></script>
 		<meta charset="utf-8">
 			<title>reHamilton</title>
@@ -26,7 +27,24 @@
   <header class="mdl-layout__header">
     <div class="mdl-layout__header-row">
       <!-- Title -->
-      <span class="mdl-layout-title">Recyclr</span>
+      <span class="mdl-layout-title">
+        re<span class="dynamicTitle">Hamilton</span><span class="dynamicTitle">Duce</span><span class="dynamicTitle">Use</span><span class="dynamicTitle">Cycle</span>
+        <script>
+          console.log("dynamicTitle script is running");
+          var quotes = $(".dynamicTitle");
+          var quoteIndex = -1;
+
+          function showNextQuote() {
+                ++quoteIndex;
+              
+              quotes.eq(quoteIndex % quotes.length)
+                  .fadeIn(1000)
+                  .delay(2000)
+                  .fadeOut(1000, showNextQuote);
+          }
+          showNextQuote();
+        </script>
+      </span>
       <!-- Add spacer, to align navigation to the right -->
       <div class="mdl-layout-spacer"></div>
         <!--
@@ -38,7 +56,7 @@
     </div>
   </header>
   <div class="mdl-layout__drawer">
-    <span class="mdl-layout-title">Overlays</span>
+    <span class="mdl-layout-title">Other Layers</span>
     <nav class="mdl-navigation">
       <a class="mdl-navigation__link" onclick="toggleLayer(0)" href="javascript:void(0)">
         Garbage Pickup Days
