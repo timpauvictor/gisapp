@@ -221,7 +221,7 @@ function mapSetup() {
     addPolygonShapeFile("../data/wasteday.zip"); //layer 0
     addPolygonShapeFile("../data/LeafYardServices.zip"); //layer 1
     addMarkerShapeFile("../data/municipalnew.zip", municipalMarkers); //layer 2
-    addMarkerShapeFile("../data/private.zip", privateMarkers); //layer 3
+    addMarkerShapeFile("../data/privatenew.zip", privateMarkers); //layer 3
     addMarkerShapeFile("../data/composting_facilities.zip", compostMarkers); //layer 4
     addMarkerShapeFile("../data/landfills.zip", landfillMarkers); //layer 5
 
