@@ -188,24 +188,46 @@ function findNearestMarker(position, featureArr) {
     }
 
     var nearestAddress = featureArr[lowestIndex].properties.Address;
-    var nearestAddressHREF = "";
-    return nearestName + " at " + nearestAddress + "<br>";
+    var htmlAddressBeginning = "<a onclick=\"addressGeocode([" + position.coords.latitude + ", " + position.coords.longitude + "],&#34;" + nearestAddress + "&#34;)\"" + " href=\"javascript:void(0)\">";
+    // console.log(htmlAddressBeginning);
+    var htmlAddressEnding = "</a>";
+    // console.log(nearestName + " at " + htmlAddressBeginning + nearestAddress + htmlAddressEnding + "<br>");
+    return nearestName + " at " + htmlAddressBeginning + nearestAddress + htmlAddressEnding + "<br>";
+}
+
+function addressGeocode(startCoords, endAddress) {
+    L.esri.Geocoding.geocode().text(endAddress).run(function(err, results, response) {
+    	showDirections(startCoords, [results.results[0].latlng.lat, results.results[0].latlng.lng]);
+    })
+}
+
+function showDirections(startCoords, endCoords) {
+    console.log("routing from: " + startCoords + "to: " + endCoords);
+    L.Routing.control({
+        waypoints: [
+            L.latLng(startCoords),
+            L.latLng(endCoords)
+        ]
+    }).addTo(__map);
+}
+
+function fetchDirections(startCoords, endAddress) { //helper function
+   endCoords = addressGeocode(endAddress);  
 }
 
 function onMapClick(e) {
     if (__activatedLayers[0] || __activatedLayers[1]) {
-        //TODO SHOW ERROR
         var snackbarContainer = document.querySelector('#error-toast');
         var innerMessage = "";
         if (__activatedLayers[0]) {
-        	innerMessage = "Oops! Turn off Garbage Pickup Days overlay via the side menu before making a custom marker!";
+            innerMessage = "Oops! Turn off Garbage Pickup Days overlay via the side menu before making a custom marker!";
         } else if (__activatedLayers[1]) {
-        	innerMessage = "Oops! Turn off Leaf and Yard Services overlay via the side menu before making a custom marker!";
+            innerMessage = "Oops! Turn off Leaf and Yard Services overlay via the side menu before making a custom marker!";
         } else {
-        	innerMessage = "Some error occured";
+            innerMessage = "Some error occured";
         }
         var data = {
-        	message: innerMessage
+            message: innerMessage
         }
         snackbarContainer.MaterialSnackbar.showSnackbar(data);
     } else {
@@ -222,6 +244,7 @@ function onMapClick(e) {
         popup.openOn(__map);
     }
 }
+
 
 
 function mapSetup() {

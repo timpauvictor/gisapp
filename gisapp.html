@@ -78,12 +78,16 @@
                 </div>
                 <!-- Load ERSI Leaflet from CDN-->
                 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v1.0.0-beta.2/leaflet.css" />
+                <link rel="stylesheet" href="./styles/leaflet-routing-machine.css"/>
                 <script src="http://cdn.leafletjs.com/leaflet/v1.0.0-beta.2/leaflet.js"></script>
                 <script src="//cdn.jsdelivr.net/leaflet.esri/2.0.0-beta.7/esri-leaflet.js"></script>
+                <link rel="stylesheet" href="//cdn.jsdelivr.net/leaflet.esri.geocoder/2.0.3/esri-leaflet-geocoder.css">
+                <script src="//cdn.jsdelivr.net/leaflet.esri.geocoder/2.0.3/esri-leaflet-geocoder.js"></script>
                 <script src="./js/easy-button.js"></script>
                 <script src="./js/catiline.js"></script>
                 <script src="./js/leaflet.shpfile.js"></script>
                 <script src="./js/shp.js"></script>
+                <script src="./js/leaflet-routing-machine.js"></script>
                 <script src="./js/mapScript.js"></script>
                 <!-- main javascript file that has been written by us -->
             </div>
@@ -97,3 +101,5 @@
 </body>
 
 </html>
+
+<a onclick="fetchDirections([43.5220036, -79.8632724],"50 Horseshoe Crescent, Hamilton, ON L0R 2H2")" href="javascript:void(0)">
