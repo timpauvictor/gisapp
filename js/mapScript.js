@@ -236,3 +236,4 @@ function mapSetup() {
 
 mapSetup();
 __map.on('click', onMapClick);
+toggleLayer(0);
