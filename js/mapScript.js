@@ -9,6 +9,68 @@ var municipalMarkers = [];
 var privateMarkers = [];
 var geolocation = undefined;
 var dirLayer = undefined;
+var accessToken = "nothing";
+var directionPoints = [];
+var compostIcon = L.icon({
+    iconUrl: './img/compostingMarker.png',
+    iconSize: [32, 32]
+});
+var landfillIcon = L.icon({
+    iconUrl: './img/garbageMarkers.png',
+    iconSize: [32, 32]
+});
+var municipalIcon = L.icon({
+    iconUrl: './img/municipalMarkers.png',
+    iconSize: [32, 32]
+});
+var privateIcon = L.icon({
+    iconUrl: './img/privateMarkers.png',
+    iconSize: [32, 32]
+});
+
+var legend = false;
+
+var garLegend = L.control({ position: 'bottomright' });
+
+garLegend.onAdd = function(map) {
+
+    var div = L.DomUtil.create('div', 'legend'),
+        labels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+    // loop through our density intervals and generate a label with a colored square for each interval
+    for (var i = 0; i < labels.length; i++) {
+        console.log(labels[i]);
+        div.innerHTML +=
+            '<i style="background:' + getGarbageColor(labels[i]) + '"></i> ' +
+            labels[i] + '<br>';
+    }
+
+    return div;
+};
+
+function getGarbageColor(garDay) {
+    if (garDay === "Monday") {
+
+        return '#d50000'
+
+    } else if (garDay === "Tuesday") {
+
+        return '#4A148C'
+
+    } else if (garDay === "Wednesday") {
+
+        return '#FFFF00'
+
+    } else if (garDay === "Thursday") {
+
+        return '#01579B'
+
+    } else if (garDay === "Friday") {
+
+        return '#004D40'
+
+    }
+}
 
 function loadMap() {
     __map = L.map("map").setView(__startingCoords, __zoomLevel);
@@ -21,11 +83,47 @@ function addPolygonShapeFile(path) { //generic function to add shapeFiles to the
     console.log("attempting to load shapefile from " + path);
     var shpfile = new L.Shapefile(path, {
         onEachFeature: function(feature, layer) {
-            if (feature.properties) {
-                layer.bindPopup(Object.keys(feature.properties).map(function(k) {
-                    return "<span class=\"markerTitle\"><b>" + k + "</b></span>" + "<span class=\"markerText\">" + feature.properties[k] + "</span>";
-                }).join("<br />"), {
-                    maxHeight: 200
+            // console.log(feature.properties);
+            var garDay = feature.properties.DAY;
+            if (garDay === "Monday") {
+                layer.setStyle({
+                    fillColor: '#d50000',
+                    weight: 2,
+                    opacity: 1,
+                    color: 'white',
+                    fillOpacity: 0.7
+                });
+            } else if (garDay === "Tuesday") {
+                layer.setStyle({
+                    fillColor: '#4A148C',
+                    weight: 2,
+                    opacity: 1,
+                    color: 'white',
+                    fillOpacity: 0.7
+                });
+            } else if (garDay === "Wednesday") {
+                layer.setStyle({
+                    fillColor: '#FFFF00',
+                    weight: 2,
+                    opacity: 1,
+                    color: 'white',
+                    fillOpacity: 0.7
+                });
+            } else if (garDay === "Thursday") {
+                layer.setStyle({
+                    fillColor: '#01579B',
+                    weight: 2,
+                    opacity: 1,
+                    color: 'white',
+                    fillOpacity: 0.7
+                });
+            } else if (garDay === "Friday") {
+                layer.setStyle({
+                    fillColor: '#004D40',
+                    weight: 2,
+                    opacity: 1,
+                    color: 'white',
+                    fillOpacity: 0.7
                 });
             }
         }
@@ -46,14 +144,23 @@ function addMarkerShapeFile(path, arr) { //generic function to add shapeFiles to
     var shpfile = new L.Shapefile(path, {
         onEachFeature: function(feature, layer) {
             if (feature.properties) {
+                if (arr === compostMarkers) {
+                    layer.setIcon(compostIcon);
+                } else if (arr === landfillMarkers) {
+                    layer.setIcon(landfillIcon);
+                } else if (arr === municipalMarkers) {
+                    layer.setIcon(municipalIcon);
+                } else if (arr === privateMarkers) {
+                    layer.setIcon(privateIcon);
+                }
                 arr.push(feature);
-                // console.dir(arr);
                 layer.bindPopup(Object.keys(feature.properties).map(function(k) {
                     return "<span class=\"markerTitle\"><b>" + k + "</b></span>" + "<span class=\"markerText\">" + feature.properties[k] + "</span>";
                 }).join("<br />"), {
-                    // maxHeight: 300
+                    maxHeight: 300
                 });
             }
+
         }
     });
     shpfile.once("data:loaded", function() {
@@ -67,6 +174,16 @@ function addMarkerShapeFile(path, arr) { //generic function to add shapeFiles to
 
 
 function toggleLayer(index) {
+    if (index === 0) {
+        if (legend) {
+            __map.removeLayer(garLegend);
+            legend = false;
+        } else {
+            garLegend.addTo(__map);
+            legend = true;
+        }
+    }
+
     if (geolocation != undefined) {
         __map.removeLayer(geolocation);
     } else {
@@ -190,34 +307,63 @@ function findNearestMarker(position, featureArr) {
 }
 
 function requestToken() {
-    $.post("https://www.arcgis.com/sharing/rest/oauth2/token/", {
+    var jQueryPromise = $.post("https://www.arcgis.com/sharing/rest/oauth2/token/", {
         "client_id": "sgUcR9ZoyDrlRvQe",
-        "client_secret": "70233a89178d4b0aa8b678b6e1fc05a8"
-    }).done(function(data) {
-        console.log(data);
+        "client_secret": "70233a89178d4b0aa8b678b6e1fc05a8",
+        "grant_type": "client_credentials"
+    })
+    var realPromise = Promise.resolve(jQueryPromise);
+    realPromise.then(function(val) {
+        valObj = JSON.parse(val);
+        accessToken = valObj.access_token;
     });
 }
 
 function addressGeocode(startCoords, endAddress) {
     L.esri.Geocoding.geocode().text(endAddress).run(function(err, results, response) {
-    	showDirections(startCoords, [results.results[0].latlng.lat, results.results[0].latlng.lng]);
+        showDirections(startCoords, [results.results[0].latlng.lat, results.results[0].latlng.lng]);
     })
 }
 
 function showDirections(startCoords, endCoords) {
-    console.log("routing from: " + startCoords + "to: " + endCoords + "TODO");
+    console.log("routing from: " + startCoords + "to: " + endCoords);
+    var stops = startCoords[1] + ", " + startCoords[0] + "; " + endCoords[1] + ", " + endCoords[0];
+    var getPromise = $.get("http://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World/solve", {
+        "token": accessToken,
+        "stops": stops,
+        "f": "json"
+    })
+    var realPromise = Promise.resolve(getPromise);
+    realPromise.then(function(val) {
+        valObj = JSON.parse(val);
+        directionPoints = valObj.routes.features[0].geometry.paths[0];
+        drawDirections(directionPoints);
+    });
 }
-submitted 6 hours ago by CottonStig to /r/funny
-328 commentssharesavehidereport
-7
-4922
-If Hillary Clinton and Donald Trump are in a boat and it capsizes. Who survives? (self.Jokes)
-submitted 6 hours ago by Daniel135790 to /r/Jokes
-1379 commentssharesavehidereport
 
+function drawDirections(points) {
+    // console.log(points);
+    // var myPolyline = L.polyline(points, {
+    //     color: 'red'
+    // });
+    // myPolyline.addTo(__map);
+
+
+    var pointA = new L.LatLng(28.635308, 77.22496);
+    var pointB = new L.LatLng(28.984461, 77.70641);
+    var pointList = [pointA, pointB];
+
+    var firstpolyline = new L.Polyline(pointList, {
+        color: 'red',
+        weight: 3,
+        opacity: 0.5,
+        smoothFactor: 1
+    });
+    firstpolyline.addTo(map);
+}
 
 function fetchDirections(startCoords, endAddress) { //helper function since this is asynchronous and that still blows my mind
-   addressGeocode(endAddress);  
+    addressGeocode(endAddress);
 }
 
 function onMapClick(e) {
@@ -235,8 +381,8 @@ function onMapClick(e) {
 }
 
 
-
 function mapSetup() {
+    requestToken();
     loadMap(); //loads map and adds it to div
 
     //load out shapefiles, having to keep track of the layers here is probably the dumbest thing I've done
@@ -254,13 +400,16 @@ function mapSetup() {
     addMunicipalRecyclingButton();
     addCompostButton();
     addLandFillButton();
+
 }
 
-requestToken();
+
 mapSetup();
 __map.on('click', onMapClick);
+// toggleLayer(0);
 toggleLayer(2);
-toggleLayer(3);
-toggleLayer(4);
-toggleLayer(5);
-console.dir(privateMarkers);
+// toggleLayer(3);
+// toggleLayer(4);
+// toggleLayer(5);
+// drawDirections();
+// console.dir(privateMarkers);
