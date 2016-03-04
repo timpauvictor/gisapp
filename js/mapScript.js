@@ -39,7 +39,7 @@ garLegend.onAdd = function(map) {
 
     // loop through our density intervals and generate a label with a colored square for each interval
     for (var i = 0; i < labels.length; i++) {
-        console.log(labels[i]);
+        // console.log(labels[i]);
         div.innerHTML +=
             '<i style="background:' + getGarbageColor(labels[i]) + '"></i> ' +
             labels[i] + '<br>';
@@ -176,9 +176,9 @@ function addMarkerShapeFile(path, arr) { //generic function to add shapeFiles to
 function toggleLayer(index) {
     if (index === 0) {
         if (legend) {
-            __map.removeLayer(garLegend);
+            __map.removeControl(garLegend);
             legend = false;
-        } else {
+        } else if (!legend) {
             garLegend.addTo(__map);
             legend = true;
         }
