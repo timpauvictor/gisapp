@@ -8,6 +8,7 @@ var landfillMarkers = [];
 var municipalMarkers = [];
 var privateMarkers = [];
 var geolocation = undefined;
+var dirLayer = undefined;
 
 function loadMap() {
     __map = L.map("map").setView(__startingCoords, __zoomLevel);
@@ -22,12 +23,13 @@ function addPolygonShapeFile(path) { //generic function to add shapeFiles to the
         onEachFeature: function(feature, layer) {
             if (feature.properties) {
                 layer.bindPopup(Object.keys(feature.properties).map(function(k) {
-                    return k + ": " + feature.properties[k];
+                    return "<span class=\"markerTitle\"><b>" + k + "</b></span>" + "<span class=\"markerText\">" + feature.properties[k] + "</span>";
                 }).join("<br />"), {
                     maxHeight: 200
                 });
             }
         }
+
     });
     shpfile.once("data:loaded", function() {
         console.log("finished loading from " + path);
@@ -44,16 +46,12 @@ function addMarkerShapeFile(path, arr) { //generic function to add shapeFiles to
     var shpfile = new L.Shapefile(path, {
         onEachFeature: function(feature, layer) {
             if (feature.properties) {
-                // if (feature.properties.Hours) {
-                // 	feature.properties.Hours.replace(/â/g, "-");
-                // 	console.log(feature.properties.Hours.search(/â/));
-                // }
                 arr.push(feature);
                 // console.dir(arr);
                 layer.bindPopup(Object.keys(feature.properties).map(function(k) {
-                    return k + ": " + feature.properties[k];
+                    return "<span class=\"markerTitle\"><b>" + k + "</b></span>" + "<span class=\"markerText\">" + feature.properties[k] + "</span>";
                 }).join("<br />"), {
-                    maxHeight: 200
+                    // maxHeight: 300
                 });
             }
         }
@@ -176,11 +174,7 @@ function findNearestMarker(position, featureArr) {
             lowestIndex = i;
         }
     }
-    // console.log(position);
-    // console.log(featureArr[lowestIndex]);
-    // console.log(lowestDistance);
     var nearestName = "";
-    // console.log(featureArr[lowestIndex].);
     if (featureArr[lowestIndex].properties.Name) {
         nearestName = featureArr[lowestIndex].properties.Name;
     } else {
@@ -195,6 +189,15 @@ function findNearestMarker(position, featureArr) {
     return nearestName + " at " + htmlAddressBeginning + nearestAddress + htmlAddressEnding + "<br>";
 }
 
+function requestToken() {
+    $.post("https://www.arcgis.com/sharing/rest/oauth2/token/", {
+        "client_id": "sgUcR9ZoyDrlRvQe",
+        "client_secret": "70233a89178d4b0aa8b678b6e1fc05a8"
+    }).done(function(data) {
+        console.log(data);
+    });
+}
+
 function addressGeocode(startCoords, endAddress) {
     L.esri.Geocoding.geocode().text(endAddress).run(function(err, results, response) {
     	showDirections(startCoords, [results.results[0].latlng.lat, results.results[0].latlng.lng]);
@@ -202,47 +205,33 @@ function addressGeocode(startCoords, endAddress) {
 }
 
 function showDirections(startCoords, endCoords) {
-    console.log("routing from: " + startCoords + "to: " + endCoords);
-    L.Routing.control({
-        waypoints: [
-            L.latLng(startCoords),
-            L.latLng(endCoords)
-        ]
-    }).addTo(__map);
+    console.log("routing from: " + startCoords + "to: " + endCoords + "TODO");
 }
+submitted 6 hours ago by CottonStig to /r/funny
+328 commentssharesavehidereport
+7
+4922
+If Hillary Clinton and Donald Trump are in a boat and it capsizes. Who survives? (self.Jokes)
+submitted 6 hours ago by Daniel135790 to /r/Jokes
+1379 commentssharesavehidereport
 
-function fetchDirections(startCoords, endAddress) { //helper function
-   endCoords = addressGeocode(endAddress);  
+
+function fetchDirections(startCoords, endAddress) { //helper function since this is asynchronous and that still blows my mind
+   addressGeocode(endAddress);  
 }
 
 function onMapClick(e) {
-    if (__activatedLayers[0] || __activatedLayers[1]) {
-        var snackbarContainer = document.querySelector('#error-toast');
-        var innerMessage = "";
-        if (__activatedLayers[0]) {
-            innerMessage = "Oops! Turn off Garbage Pickup Days overlay via the side menu before making a custom marker!";
-        } else if (__activatedLayers[1]) {
-            innerMessage = "Oops! Turn off Leaf and Yard Services overlay via the side menu before making a custom marker!";
-        } else {
-            innerMessage = "Some error occured";
-        }
-        var data = {
-            message: innerMessage
-        }
-        snackbarContainer.MaterialSnackbar.showSnackbar(data);
-    } else {
-        var popup = L.popup();
-        popup.setLatLng(e.latlng);
-        var position = { //this is hideous oh my god but i didn't want to rewrite code so whatever it works
-                coords: {
-                    latitude: e.latlng.lat,
-                    longitude: e.latlng.lng
-                }
+    var popup = L.popup();
+    popup.setLatLng(e.latlng);
+    var position = { //this is hideous oh my god but i didn't want to rewrite code so whatever it works
+            coords: {
+                latitude: e.latlng.lat,
+                longitude: e.latlng.lng
             }
-            // console.log(position);
-        popup.setContent("<b><center>This is your custom waypoint!</center></b><br> The <b>nearest private</b> recycling location is " + findNearestMarker(position, privateMarkers) + "The <b>nearest municipal</b> recycling location is " + findNearestMarker(position, municipalMarkers) + "The <b>nearest landfill</b> location is " + findNearestMarker(position, landfillMarkers) + "The <b>nearest compost</b> location is " + findNearestMarker(position, compostMarkers));
-        popup.openOn(__map);
-    }
+        }
+        // console.log(position);
+    popup.setContent("<b><center>This is your custom waypoint!</center></b><br> The <b>nearest private</b> recycling location is " + findNearestMarker(position, privateMarkers) + "The <b>nearest municipal</b> recycling location is " + findNearestMarker(position, municipalMarkers) + "The <b>nearest landfill</b> location is " + findNearestMarker(position, landfillMarkers) + "The <b>nearest compost</b> location is " + findNearestMarker(position, compostMarkers));
+    popup.openOn(__map);
 }
 
 
@@ -267,8 +256,11 @@ function mapSetup() {
     addLandFillButton();
 }
 
+requestToken();
 mapSetup();
 __map.on('click', onMapClick);
-toggleLayer(0);
 toggleLayer(2);
 toggleLayer(3);
+toggleLayer(4);
+toggleLayer(5);
+console.dir(privateMarkers);

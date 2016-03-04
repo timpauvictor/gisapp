@@ -1,5 +1,16 @@
-.larger { 
-	font-size: 1.3em;
+.larger {
+	font-size: 1.5em;
 }
 
 .dynamicTitle { display: none; }
+
+.markerTitle {
+	color: #009688;
+    padding-right: 5px;
+}
+
+.markerText {
+	padding: 2px;
+	padding-left: 20%;
+    padding-bottom: 5px;
+}
