@@ -1,3 +1,5 @@
+//432
+
 var __startingCoords = [43.240, -79.848];
 var __zoomLevel = 12;
 var __map;
@@ -10,7 +12,8 @@ var privateMarkers = [];
 var geolocation = undefined;
 var dirLayer = undefined;
 var accessToken = "nothing";
-var directionPoints = [];
+var directionLayers = [];
+var directionStr = "";
 var compostIcon = L.icon({
     iconUrl: './img/compostingMarker.png',
     iconSize: [32, 32]
@@ -28,7 +31,8 @@ var privateIcon = L.icon({
     iconSize: [32, 32]
 });
 
-var legend = false;
+var garLegendActive = false;
+var leafLegendActive = false;
 
 var garLegend = L.control({ position: 'bottomright' });
 
@@ -37,16 +41,43 @@ garLegend.onAdd = function(map) {
     var div = L.DomUtil.create('div', 'legend'),
         labels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
-    // loop through our density intervals and generate a label with a colored square for each interval
+    div.innerHTML += "Legend: <br>"
     for (var i = 0; i < labels.length; i++) {
         // console.log(labels[i]);
         div.innerHTML +=
-            '<i style="background:' + getGarbageColor(labels[i]) + '"></i> ' +
-            labels[i] + '<br>';
+            '<i style="background:' + getGarbageColor(labels[i]) + '"></i> <b>' +
+            labels[i] + '</b><br>';
     }
 
     return div;
 };
+
+var leafLegend = L.control({ position: 'bottomright' });
+
+leafLegend.onAdd = function(map) {
+
+    var div = L.DomUtil.create('div', 'legend'),
+        labels = ['Yes', 'No'];
+
+    div.innerHTML += 'Do I get leaf and yard waste pickup? <br>';
+    for (var i = 0; i < labels.length; i++) {
+        // console.log(labels[i]);
+        div.innerHTML +=
+            '<i style="background:' + getYesNoColour(labels[i]) + '"></i> <b>' +
+            labels[i] + '</b><br>';
+    }
+
+    return div;
+};
+
+function getYesNoColour(res) {
+    if (res === 'Yes') {
+        return '#d50000';
+    } else if (res === 'No') {
+        return '#64DD17';
+    }
+}
+
 
 function getGarbageColor(garDay) {
     if (garDay === "Monday") {
@@ -84,48 +115,80 @@ function addPolygonShapeFile(path) { //generic function to add shapeFiles to the
     var shpfile = new L.Shapefile(path, {
         onEachFeature: function(feature, layer) {
             // console.log(feature.properties);
-            var garDay = feature.properties.DAY;
-            if (garDay === "Monday") {
-                layer.setStyle({
-                    fillColor: '#d50000',
-                    weight: 2,
-                    opacity: 1,
-                    color: 'white',
-                    fillOpacity: 0.7
+            if (feature.properties.DAY) {
+                var garDay = feature.properties.DAY;
+                if (garDay === "Monday") {
+                    layer.setStyle({
+                        fillColor: '#d50000',
+                        weight: 2,
+                        opacity: 1,
+                        color: '#4CAF50',
+                        fillOpacity: 0.7
+                    });
+                } else if (garDay === "Tuesday") {
+                    layer.setStyle({
+                        fillColor: '#4A148C',
+                        weight: 2,
+                        opacity: 1,
+                        color: '#4CAF50',
+                        fillOpacity: 0.7
+                    });
+                } else if (garDay === "Wednesday") {
+                    layer.setStyle({
+                        fillColor: '#FFFF00',
+                        weight: 2,
+                        opacity: 1,
+                        color: '#4CAF50',
+                        fillOpacity: 0.7
+                    });
+                } else if (garDay === "Thursday") {
+                    layer.setStyle({
+                        fillColor: '#01579B',
+                        weight: 2,
+                        opacity: 1,
+                        color: '#4CAF50',
+                        fillOpacity: 0.7
+                    });
+                } else if (garDay === "Friday") {
+                    layer.setStyle({
+                        fillColor: '#004D40',
+                        weight: 2,
+                        opacity: 1,
+                        color: '#4CAF50',
+                        fillOpacity: 0.7
+                    });
+                }
+                layer.on({
+                    mouseover: highlightFeature,
+                    mouseout: resetHighlight
                 });
-            } else if (garDay === "Tuesday") {
-                layer.setStyle({
-                    fillColor: '#4A148C',
-                    weight: 2,
-                    opacity: 1,
-                    color: 'white',
-                    fillOpacity: 0.7
+            } //end day if
+
+            if (feature.properties.Available) {
+                if (feature.properties.Available === "Yes") {
+                    layer.setStyle({
+                        fillColor: '#d50000',
+                        weight: 2,
+                        opacity: 1,
+                        color: '#4CAF50',
+                        fillOpacity: 0.7
+                    });
+                } else {
+                    layer.setStyle({
+                        fillColor: '#64DD17',
+                        weight: 2,
+                        opacity: 1,
+                        color: '#4CAF50',
+                        fillOpacity: 0.7
+                    });
+                }
+                layer.on({
+                    mouseover: highlightFeature,
+                    mouseout: resetHighlight
                 });
-            } else if (garDay === "Wednesday") {
-                layer.setStyle({
-                    fillColor: '#FFFF00',
-                    weight: 2,
-                    opacity: 1,
-                    color: 'white',
-                    fillOpacity: 0.7
-                });
-            } else if (garDay === "Thursday") {
-                layer.setStyle({
-                    fillColor: '#01579B',
-                    weight: 2,
-                    opacity: 1,
-                    color: 'white',
-                    fillOpacity: 0.7
-                });
-            } else if (garDay === "Friday") {
-                layer.setStyle({
-                    fillColor: '#004D40',
-                    weight: 2,
-                    opacity: 1,
-                    color: 'white',
-                    fillOpacity: 0.7
-                });
-            }
+
+            } //end yard if
+
         }
 
     });
@@ -137,6 +200,31 @@ function addPolygonShapeFile(path) { //generic function to add shapeFiles to the
     __shapeLayers.push(shpfile);
     // console.log(shpfile.attribute('alt'));
     __activatedLayers.push(false);
+}
+
+function resetHighlight(e) {
+    var layer = e.target;
+
+    layer.setStyle({
+        weight: 2,
+        color: '#4CAF50',
+        fillOpacity: 0.7
+    })
+
+
+}
+
+function highlightFeature(e) {
+    var layer = e.target;
+
+    layer.setStyle({
+        weight: 4,
+        color: '#212121',
+        fillOpacity: 0.8
+    });
+    if (!L.Browser.ie && !L.Browser.opera) {
+        layer.bringToFront();
+    }
 }
 
 function addMarkerShapeFile(path, arr) { //generic function to add shapeFiles to the map, then stores the added shpfile object in an array
@@ -172,15 +260,29 @@ function addMarkerShapeFile(path, arr) { //generic function to add shapeFiles to
     __activatedLayers.push(false);
 }
 
+function toggleSteps() {
+
+}
+
 
 function toggleLayer(index) {
     if (index === 0) {
-        if (legend) {
+        if (garLegendActive) {
             __map.removeControl(garLegend);
-            legend = false;
-        } else if (!legend) {
+            garLegendActive = false;
+        } else if (!garLegendActive) {
             garLegend.addTo(__map);
-            legend = true;
+            garLegendActive = true;
+        }
+    }
+
+    if (index === 1) {
+        if (leafLegendActive) {
+            __map.removeControl(leafLegend);
+            leafLegendActive = false;
+        } else if (!leafLegendActive) {
+            leafLegend.addTo(__map);
+            leafLegendActive = true;
         }
     }
 
@@ -325,8 +427,22 @@ function addressGeocode(startCoords, endAddress) {
     })
 }
 
+function openSpecPopup(coords) {
+    for (i in privateMarkers) {
+        var markerLat = privateMarkers[i].geometry.coordinates[0];
+        var markerLng = privateMarkers[i].geometry.coordinates[1];
+        console.log()
+        if (coords[1] === markerLat) {
+            if (coords[0] === markerLng) {
+                privateMarkers[i].openPopup();
+            }
+        }
+    }
+}
+
 function showDirections(startCoords, endCoords) {
     console.log("routing from: " + startCoords + "to: " + endCoords);
+    openSpecPopup(endCoords);
     var stops = startCoords[1] + ", " + startCoords[0] + "; " + endCoords[1] + ", " + endCoords[0];
     var getPromise = $.get("http://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World/solve", {
         "token": accessToken,
@@ -336,30 +452,53 @@ function showDirections(startCoords, endCoords) {
     var realPromise = Promise.resolve(getPromise);
     realPromise.then(function(val) {
         valObj = JSON.parse(val);
+        // console.log(valObj);
         directionPoints = valObj.routes.features[0].geometry.paths[0];
+        directionStr = valObj.directions[0].features;
+        // console.log(directionStr);
         drawDirections(directionPoints);
+
     });
 }
 
+function clearDirections() {
+    for (var i = 0; i < directionLayers.length; i++) {
+        __map.removeLayer(directionLayers[i]);
+    }
+}
+
 function drawDirections(points) {
+    clearDirections();
     // console.log(points);
-    // var myPolyline = L.polyline(points, {
-    //     color: 'red'
+    for (var i = 0; i < points.length - 1; i++) {
+        var pointA = new L.LatLng(points[i][1], points[i][0]);
+        var pointB = new L.LatLng(points[i + 1][1], points[i + 1][0]);
+        var pointsList = [pointA, pointB];
+        var myPolyline = L.polyline(pointsList, {
+            color: 'red',
+            weight: 3,
+            opacity: 0.5,
+            smoothFactor: 1
+        });
+        directionLayers.push(myPolyline);
+        myPolyline.addTo(__map);
+    }
+
+
+
+
+    // console.log(points);
+    // var pointA = new L.LatLng(points[0][1], points[0][0]);
+    // var pointB = new L.LatLng(28.984461, 77.70641);
+    // var pointList = [pointA, pointB];
+
+    // var firstpolyline = new L.Polyline(pointList, {
+    //     color: 'red',
+    //     weight: 3,
+    //     opacity: 0.5,
+    //     smoothFactor: 1
     // });
-    // myPolyline.addTo(__map);
-
-
-    var pointA = new L.LatLng(28.635308, 77.22496);
-    var pointB = new L.LatLng(28.984461, 77.70641);
-    var pointList = [pointA, pointB];
-
-    var firstpolyline = new L.Polyline(pointList, {
-        color: 'red',
-        weight: 3,
-        opacity: 0.5,
-        smoothFactor: 1
-    });
-    firstpolyline.addTo(map);
+    // firstpolyline.addTo(__map);
 }
 
 function fetchDirections(startCoords, endAddress) { //helper function since this is asynchronous and that still blows my mind
@@ -404,10 +543,12 @@ function mapSetup() {
 }
 
 
+console.dir(privateMarkers);
 mapSetup();
 __map.on('click', onMapClick);
+// drawDirections();
 // toggleLayer(0);
-toggleLayer(2);
+// toggleLayer(2);
 // toggleLayer(3);
 // toggleLayer(4);
 // toggleLayer(5);

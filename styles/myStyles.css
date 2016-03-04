@@ -19,7 +19,7 @@
 	text-align: left;
 	padding: 6px 8px;
     line-height: 18px;
-    background-color: #E0E0E0;
+    background-color: #FAFAFA;
     box-shadow: 0 0 15px rgba(0,0,0,0.2);
     border-radius: 5px;
 }
@@ -29,4 +29,8 @@
     float: left;
     margin-right: 8px;
     opacity: 0.7;
+}
+
+.steps {
+	
 }
