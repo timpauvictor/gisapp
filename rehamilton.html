@@ -6,10 +6,11 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <link rel="stylesheet" href="https://code.getmdl.io/1.1.1/material.green-orange.min.css" />
         <link rel="stylesheet" href="./styles/easy-button.css" />
-        <link rel="stylesheet" href="./styles/myStyles.css" />
         <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"/>
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v1.0.0-beta.2/leaflet.css" />
+        <link rel="stylesheet" href="./styles/leaflet-routing-machine.css"/>
+        <link rel="stylesheet" href="./styles/myStyles.css" />
         <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"> -->
-
         
         <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
         <script defer src="https://code.getmdl.io/1.1.1/material.min.js"></script>
@@ -35,9 +36,9 @@
                         function showNextQuote() {
                         ++quoteIndex;
                         quotes.eq(quoteIndex % quotes.length)
-                        .fadeIn(1000)
-                        .delay(2000)
-                        .fadeOut(1000, showNextQuote);
+                            .fadeIn(1000)
+                            .delay(2000)
+                            .fadeOut(1000, showNextQuote);
                         }
                         showNextQuote();
                         </script>
@@ -48,7 +49,7 @@
                     NAVIGATION CODE
                     -->
                     <nav class="mdl-navigation">
-                        <a class="mdl-navigation__link" onclick="HelpInfo()" href="javascript:void(0)"><i class="icon ion-help larger"></i></a>
+                        <a class="mdl-navigation__link" onclick="document.getElementById('light').style.display='block';document.getElementById('fade').style.display='block'" href="javascript:void(0)"><i class="icon ion-help larger"></i></a>
                         <a class="mdl-navigation__link" onclick="aboutInfo()" href="javascript:void(0)"><i class="icon ion-information larger"></i></a>
                         <!-- placeholder incase i need to add more -->
                     </nav>
@@ -77,8 +78,6 @@
                     <button class="mdl-snackbar__action" type="button"></button>
                 </div>
                 <!-- Load ERSI Leaflet from CDN-->
-                <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v1.0.0-beta.2/leaflet.css" />
-                <link rel="stylesheet" href="./styles/leaflet-routing-machine.css"/>
                 <script src="http://cdn.leafletjs.com/leaflet/v1.0.0-beta.2/leaflet.js"></script>
                 <script src="//cdn.jsdelivr.net/leaflet.esri/2.0.0-beta.7/esri-leaflet.js"></script>
                 <link rel="stylesheet" href="//cdn.jsdelivr.net/leaflet.esri.geocoder/2.0.3/esri-leaflet-geocoder.css">
@@ -91,6 +90,8 @@
                 <script src="./js/leaflet-routing-machine.js"></script>
                 <script src="./js/mapScript.js"></script>
                 <!-- main javascript file that has been written by us -->
+                <div id="light" class="white_content">This is the lightbox content. <a href = "javascript:void(0)" onclick = "document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'">Close</a></div>
+                <div id="fade" class="black_overlay"></div>
             </div>
         </body>
     </html>
@@ -100,7 +101,3 @@
 </div>
 </body>
 </html>
-
-<a onclick="addressGeocode([43.25270484069845, -79.81842041015626],&#34;1579 Burlington St E, Hamilton, ON,&#34;[object Object]&#34;)" href="javascript:void(0)">
-<a onclick="addressGeocode([43.26420629463839, -79.7991943359375],"1579 Burlington St E, Hamilton, ON",[object Object])" href="javascript:void(0)">
-<a onclick="addressGeocode([43.244202369730026, -79.91798400878908],"1579 Burlington St E, Hamilton, ON")" href="javascript:void(0)">

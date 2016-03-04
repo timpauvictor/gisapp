@@ -243,7 +243,7 @@ function addMarkerShapeFile(path, arr) { //generic function to add shapeFiles to
                 }
                 arr.push(feature);
                 layer.bindPopup(Object.keys(feature.properties).map(function(k) {
-                    return "<span class=\"markerTitle\"><b>" + k + "</b></span>" + "<span class=\"markerText\">" + feature.properties[k] + "</span>";
+                    return "<div><span class=\"markerTitle\"><b>" + k + "</b></span>" + "<span class=\"markerText\">" + feature.properties[k] + "</span>";
                 }).join("<br />"), {
                     maxHeight: 300
                 });

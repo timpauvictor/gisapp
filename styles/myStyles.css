@@ -6,18 +6,45 @@
 
 .markerTitle {
 	color: #009688;
-    padding-right: 5px;
+  padding-right: 5px;
+}
+
+.black_overlay{
+  display: none;
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  z-index:1001;
+  -moz-opacity: 0.8;
+  opacity:.80;
+  filter: alpha(opacity=80);
+}
+
+.white_content {
+  display: none;
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  width: 50%;
+  height: 50%;
+  padding: 16px;
+  background-color: white;
+  z-index:1002;
+  overflow: auto;
+  border-radius: 5px;
 }
 
 .markerText {
-	padding: 2px;
-	padding-left: 20%;
-    padding-bottom: 5px;
+  /*float: right;*/
+  width: 50%;
+    /*text-align: right;*/
 }
 
 .legend.leaflet-control {
-	text-align: left;
-	padding: 6px 8px;
+	  padding: 6px 8px;
     line-height: 18px;
     background-color: #FAFAFA;
     box-shadow: 0 0 15px rgba(0,0,0,0.2);
