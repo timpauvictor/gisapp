@@ -72,9 +72,9 @@ leafLegend.onAdd = function(map) {
 
 function getYesNoColour(res) {
     if (res === 'Yes') {
-        return '#d50000';
-    } else if (res === 'No') {
         return '#64DD17';
+    } else if (res === 'No') {
+        return '#d50000';
     }
 }
 
@@ -167,7 +167,7 @@ function addPolygonShapeFile(path) { //generic function to add shapeFiles to the
             if (feature.properties.Available) {
                 if (feature.properties.Available === "Yes") {
                     layer.setStyle({
-                        fillColor: '#d50000',
+                        fillColor: '#64DD17',
                         weight: 2,
                         opacity: 1,
                         color: '#4CAF50',
@@ -175,7 +175,7 @@ function addPolygonShapeFile(path) { //generic function to add shapeFiles to the
                     });
                 } else {
                     layer.setStyle({
-                        fillColor: '#64DD17',
+                        fillColor: '#d50000',
                         weight: 2,
                         opacity: 1,
                         color: '#4CAF50',
@@ -260,10 +260,6 @@ function addMarkerShapeFile(path, arr) { //generic function to add shapeFiles to
     __activatedLayers.push(false);
 }
 
-function toggleSteps() {
-
-}
-
 
 function toggleLayer(index) {
     if (index === 0) {
@@ -305,6 +301,17 @@ function clearAllLayers() {
         __map.removeLayer(__shapeLayers[i]);
         __activatedLayers[i] = false;
     }
+
+    if (leafLegendActive) {
+        __map.removeControl(leafLegend);
+        leafLegendActive = false;
+    }
+
+    if (garLegendActive) {
+        __map.removeControl(garLegend);
+        garLegendActive =false;
+    }
+
 }
 
 function findMe() {
@@ -333,10 +340,11 @@ function addFindMeButton() {
 }
 
 function addMunicipalRecyclingButton() {
+    //icon icon-refresh larger
     L.easyButton('icon ion-refresh larger', function() {
             toggleLayer(2);
         },
-        "Display municipal recycling locations").addTo(__map);
+        "Display private recycling locations").addTo(__map);
 }
 
 function addPrivateRecyclingButton() {
@@ -431,7 +439,7 @@ function openSpecPopup(coords) {
     for (i in privateMarkers) {
         var markerLat = privateMarkers[i].geometry.coordinates[0];
         var markerLng = privateMarkers[i].geometry.coordinates[1];
-        console.log()
+        // console.log()
         if (coords[1] === markerLat) {
             if (coords[0] === markerLng) {
                 privateMarkers[i].openPopup();
@@ -476,29 +484,13 @@ function drawDirections(points) {
         var pointsList = [pointA, pointB];
         var myPolyline = L.polyline(pointsList, {
             color: 'red',
-            weight: 3,
+            weight: 5,
             opacity: 0.5,
             smoothFactor: 1
         });
         directionLayers.push(myPolyline);
         myPolyline.addTo(__map);
     }
-
-
-
-
-    // console.log(points);
-    // var pointA = new L.LatLng(points[0][1], points[0][0]);
-    // var pointB = new L.LatLng(28.984461, 77.70641);
-    // var pointList = [pointA, pointB];
-
-    // var firstpolyline = new L.Polyline(pointList, {
-    //     color: 'red',
-    //     weight: 3,
-    //     opacity: 0.5,
-    //     smoothFactor: 1
-    // });
-    // firstpolyline.addTo(__map);
 }
 
 function fetchDirections(startCoords, endAddress) { //helper function since this is asynchronous and that still blows my mind
@@ -543,14 +535,11 @@ function mapSetup() {
 }
 
 
-console.dir(privateMarkers);
+//console.dir(privateMarkers);
 mapSetup();
 __map.on('click', onMapClick);
-// drawDirections();
-// toggleLayer(0);
-// toggleLayer(2);
-// toggleLayer(3);
-// toggleLayer(4);
-// toggleLayer(5);
-// drawDirections();
-// console.dir(privateMarkers);
+//default opened layers
+for (var i = 2; i <= 5; i++) {
+    toggleLayer(i);
+}
+
