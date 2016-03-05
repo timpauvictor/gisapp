@@ -316,6 +316,7 @@ function clearAllLayers() {
         garLegendActive =false;
     }
 
+    clearDirections();
 }
 
 function findMe() {
@@ -355,14 +356,14 @@ function addMunicipalRecyclingButton() {
     L.easyButton('icon ion-cube larger', function() {
             toggleLayer(2);
         },
-        "Display private recycling locations").addTo(__map);
+        "Display municipal recycling locations").addTo(__map);
 }
 
 function addPrivateRecyclingButton() {
     L.easyButton('icon ion-loop larger', function() {
             toggleLayer(3);
         },
-        "Display municipal recycling locations").addTo(__map);
+        "Display private recycling locations").addTo(__map);
 }
 
 function addCompostButton() {
