@@ -1,5 +1,3 @@
-//432
-
 var __startingCoords = [43.240, -79.848];
 var __zoomLevel = 12;
 var __map;
@@ -23,11 +21,11 @@ var landfillIcon = L.icon({
     iconSize: [32, 32]
 });
 var municipalIcon = L.icon({
-    iconUrl: './img/municipalMarkers.png',
+    iconUrl: './img/municipal.png',
     iconSize: [32, 32]
 });
 var privateIcon = L.icon({
-    iconUrl: './img/privateMarkers.png',
+    iconUrl: './img/private.png',
     iconSize: [32, 32]
 });
 
@@ -72,9 +70,9 @@ leafLegend.onAdd = function(map) {
 
 function getYesNoColour(res) {
     if (res === 'Yes') {
-        return '#64DD17';
+        return '#4CAF50';
     } else if (res === 'No') {
-        return '#d50000';
+        return '#f44336';
     }
 }
 
@@ -82,23 +80,23 @@ function getYesNoColour(res) {
 function getGarbageColor(garDay) {
     if (garDay === "Monday") {
 
-        return '#d50000'
+        return '#66c2a5'
 
     } else if (garDay === "Tuesday") {
 
-        return '#4A148C'
+        return '#fc8d62'
 
     } else if (garDay === "Wednesday") {
 
-        return '#FFFF00'
+        return '#8da0cb'
 
     } else if (garDay === "Thursday") {
 
-        return '#01579B'
+        return '#e78ac3'
 
     } else if (garDay === "Friday") {
 
-        return '#004D40'
+        return '#a6d854'
 
     }
 }
@@ -117,45 +115,51 @@ function addPolygonShapeFile(path) { //generic function to add shapeFiles to the
             // console.log(feature.properties);
             if (feature.properties.DAY) {
                 var garDay = feature.properties.DAY;
+                layer.setStyle({
+                    weight: 2,
+                    opacity: 1,
+                    color: '#4CAF50',
+                    fillOpacity: 0.7
+                });
                 if (garDay === "Monday") {
                     layer.setStyle({
-                        fillColor: '#d50000',
-                        weight: 2,
-                        opacity: 1,
-                        color: '#4CAF50',
-                        fillOpacity: 0.7
+                        fillColor: '#fc8d62',
+                        // weight: 2,
+                        // opacity: 1,
+                        // color: '#4CAF50',
+                        // fillOpacity: 0.7
                     });
                 } else if (garDay === "Tuesday") {
                     layer.setStyle({
-                        fillColor: '#4A148C',
-                        weight: 2,
-                        opacity: 1,
-                        color: '#4CAF50',
-                        fillOpacity: 0.7
+                        fillColor: '#fc8d62',
+                        // weight: 2,
+                        // opacity: 1,
+                        // color: '#4CAF50',
+                        // fillOpacity: 0.7
                     });
                 } else if (garDay === "Wednesday") {
                     layer.setStyle({
-                        fillColor: '#FFFF00',
-                        weight: 2,
-                        opacity: 1,
-                        color: '#4CAF50',
-                        fillOpacity: 0.7
+                        fillColor: '#8da0cb',
+                        // weight: 2,
+                        // opacity: 1,
+                        // color: '#4CAF50',
+                        // fillOpacity: 0.7
                     });
                 } else if (garDay === "Thursday") {
                     layer.setStyle({
-                        fillColor: '#01579B',
-                        weight: 2,
-                        opacity: 1,
-                        color: '#4CAF50',
-                        fillOpacity: 0.7
+                        fillColor: '#e78ac3',
+                        // weight: 2,
+                        // opacity: 1,
+                        // color: '#4CAF50',
+                        // fillOpacity: 0.7
                     });
                 } else if (garDay === "Friday") {
                     layer.setStyle({
-                        fillColor: '#004D40',
-                        weight: 2,
-                        opacity: 1,
-                        color: '#4CAF50',
-                        fillOpacity: 0.7
+                        fillColor: '#a6d854',
+                        // weight: 2,
+                        // opacity: 1,
+                        // color: '#4CAF50',
+                        // fillOpacity: 0.7
                     });
                 }
                 layer.on({
@@ -167,7 +171,7 @@ function addPolygonShapeFile(path) { //generic function to add shapeFiles to the
             if (feature.properties.Available) {
                 if (feature.properties.Available === "Yes") {
                     layer.setStyle({
-                        fillColor: '#64DD17',
+                        fillColor: '#4CAF50',
                         weight: 2,
                         opacity: 1,
                         color: '#4CAF50',
@@ -175,7 +179,7 @@ function addPolygonShapeFile(path) { //generic function to add shapeFiles to the
                     });
                 } else {
                     layer.setStyle({
-                        fillColor: '#d50000',
+                        fillColor: '#f44336',
                         weight: 2,
                         opacity: 1,
                         color: '#4CAF50',
@@ -321,10 +325,10 @@ function findMe() {
                 __map.removeLayer(geolocation);
             }
             var marker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(__map);
-            marker.bindPopup("<b><center>This is you!</center></b><br> The <b>nearest private</b> recycling location is " + findNearestMarker(position, privateMarkers) + "The <b>nearest municipal</b> recycling location is " + findNearestMarker(position, municipalMarkers) + "The <b>nearest landfill</b> location is " + findNearestMarker(position, landfillMarkers) + "The <b>nearest compost</b> location is " + findNearestMarker(position, compostMarkers));
+            marker.bindPopup("<b><center>This is you!</center></b><br> The <b>nearest private</b> recycling location is " + findNearestMarker(position, privateMarkers) + "The <b>nearest municipal</b> recycling location is " + findNearestMarker(position, municipalMarkers));
             // marker.openPopup();
             geolocation = marker;
-            __map.setView([position.coords.latitude, position.coords.longitude], 18);
+            __map.setView([position.coords.latitude, position.coords.longitude], 16)
             marker.openPopup();
         });
     } else {
@@ -332,8 +336,15 @@ function findMe() {
     }
 }
 
+function addClearDirButton() {
+    L.easyButton('icon ion-android-close', function() {
+        clearDirections();
+    },
+    "Clear directions").addTo(__map);
+}
+
 function addFindMeButton() {
-    L.easyButton('icon ion-android-locate larger', function() {
+    L.easyButton('icon ion-pin larger', function() {
             findMe();
         },
         "Find my location").addTo(__map);
@@ -341,7 +352,7 @@ function addFindMeButton() {
 
 function addMunicipalRecyclingButton() {
     //icon icon-refresh larger
-    L.easyButton('icon ion-refresh larger', function() {
+    L.easyButton('icon ion-cube larger', function() {
             toggleLayer(2);
         },
         "Display private recycling locations").addTo(__map);
@@ -351,7 +362,7 @@ function addPrivateRecyclingButton() {
     L.easyButton('icon ion-loop larger', function() {
             toggleLayer(3);
         },
-        "Display private recycling locations").addTo(__map);
+        "Display municipal recycling locations").addTo(__map);
 }
 
 function addCompostButton() {
@@ -366,6 +377,13 @@ function addLandFillButton() {
             toggleLayer(5);
         },
         "Display landfill locations").addTo(__map);
+}
+
+function addHomeButton() {
+    L.easyButton("icon ion-home larger", function() {
+        __map.setView(__startingCoords, __zoomLevel);
+    },
+    "Reset to initial view").addTo(__map);
 }
 
 function toRad(value) {
@@ -418,8 +436,8 @@ function findNearestMarker(position, featureArr) {
 
 function requestToken() {
     var jQueryPromise = $.post("https://www.arcgis.com/sharing/rest/oauth2/token/", {
-        "client_id": "sgUcR9ZoyDrlRvQe",
-        "client_secret": "70233a89178d4b0aa8b678b6e1fc05a8",
+        "client_id": "4zKEN5BilxUnVaqy",
+        "client_secret": "804e33b62c6247e4b2465d6cbc929e43",
         "grant_type": "client_credentials"
     })
     var realPromise = Promise.resolve(jQueryPromise);
@@ -507,7 +525,7 @@ function onMapClick(e) {
             }
         }
         // console.log(position);
-    popup.setContent("<b><center>This is your custom waypoint!</center></b><br> The <b>nearest private</b> recycling location is " + findNearestMarker(position, privateMarkers) + "The <b>nearest municipal</b> recycling location is " + findNearestMarker(position, municipalMarkers) + "The <b>nearest landfill</b> location is " + findNearestMarker(position, landfillMarkers) + "The <b>nearest compost</b> location is " + findNearestMarker(position, compostMarkers));
+    popup.setContent("<b><center>This is your custom waypoint!</center></b><br> The <b>nearest private</b> recycling location is " + findNearestMarker(position, privateMarkers) + "The <b>nearest municipal</b> recycling location is " + findNearestMarker(position, municipalMarkers));
     popup.openOn(__map);
 }
 
@@ -526,20 +544,22 @@ function mapSetup() {
 
     __map.invalidateSize(); //just in case that bug rears it's ugly head
     //load our buttons
+    addHomeButton();
     addFindMeButton();
     addPrivateRecyclingButton();
     addMunicipalRecyclingButton();
     addCompostButton();
     addLandFillButton();
+    addClearDirButton();
 
 }
 
 
 //console.dir(privateMarkers);
+
 mapSetup();
 __map.on('click', onMapClick);
 //default opened layers
 for (var i = 2; i <= 5; i++) {
     toggleLayer(i);
 }
-

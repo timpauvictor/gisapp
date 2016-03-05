@@ -36,9 +36,9 @@
                         function showNextQuote() {
                         ++quoteIndex;
                         quotes.eq(quoteIndex % quotes.length)
-                            .fadeIn(1000)
-                            .delay(2000)
-                            .fadeOut(1000, showNextQuote);
+                        .fadeIn(1000)
+                        .delay(2000)
+                        .fadeOut(1000, showNextQuote);
                         }
                         showNextQuote();
                         </script>
@@ -50,7 +50,7 @@
                     -->
                     <nav class="mdl-navigation">
                         <a class="mdl-navigation__link" onclick="document.getElementById('light').style.display='block';document.getElementById('fade').style.display='block'" href="javascript:void(0)"><i class="icon ion-help larger"></i></a>
-                        <a class="mdl-navigation__link" onclick="aboutInfo()" href="javascript:void(0)"><i class="icon ion-information larger"></i></a>
+                        <a class="mdl-navigation__link" onclick="document.getElementById('light2').style.display='block';document.getElementById('fade').style.display='block'" href="javascript:void(0)"><i class="icon ion-information larger"></i></a>
                         <!-- placeholder incase i need to add more -->
                     </nav>
                 </div>
@@ -90,14 +90,24 @@
                 <script src="./js/leaflet-routing-machine.js"></script>
                 <script src="./js/mapScript.js"></script>
                 <!-- main javascript file that has been written by us -->
-                <div id="light" class="white_content">This is the lightbox content. <a href = "javascript:void(0)" onclick = "document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'">Close</a></div>
-                <div id="fade" class="black_overlay"></div>
-            </div>
-        </body>
-    </html>
-    <!-- Your content goes here -->
-</div>
-</main>
-</div>
+                <div id="light" class="white_content">
+                    <center><img id="logo" src="./img/logo.png"/></center>
+                    <a href = "javascript:void(0)" onclick = "document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'"><centre>Close</centre></a></div>
+                    <div id="fade" class="black_overlay"></div>
+                    <div id="light2" class="white_content">
+                        <!-- <img class="recImage" src="./img/recycling.png"/> -->
+                        <a href = "javascript:void(0)" onclick = "document.getElementById('light2').style.display='none';document.getElementById('fade').style.display='none'"><br><centre>Close</a></centre></div>
+                        <div id="fade" class="black_overlay"></div>
+                        <script>
+                        document.getElementById('light').style.display='block';
+                        document.getElementById('fade').style.display='block';
+                        </script>
+                    </div>
+                </body>
+            </html>
+            <!-- Your content goes here -->
+        </div>
+        </main>
+    </div>
 </body>
 </html>
