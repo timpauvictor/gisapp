@@ -12,6 +12,9 @@ var dirLayer = undefined;
 var accessToken = "nothing";
 var directionLayers = [];
 var directionStr = "";
+var customWaypoint;
+var geoMarker;
+
 var compostIcon = L.icon({
     iconUrl: './img/compostingMarker.png',
     iconSize: [32, 32]
@@ -325,12 +328,13 @@ function findMe() {
             if (geolocation != undefined) {
                 __map.removeLayer(geolocation);
             }
-            var marker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(__map);
-            marker.bindPopup("<b><center>This is you!</center></b><br> The <b>nearest private</b> recycling location is " + findNearestMarker(position, privateMarkers) + "The <b>nearest municipal</b> recycling location is " + findNearestMarker(position, municipalMarkers));
+            geoMarker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(__map);
+            geoMarker.bindPopup("<b><center>This is you!</center></b><br> The <b>nearest private</b> recycling location is " + findNearestMarker(position, privateMarkers) + "The <b>nearest municipal</b> recycling location is " + findNearestMarker(position, municipalMarkers));
             // marker.openPopup();
-            geolocation = marker;
+            geolocation = geoMarker;
             __map.setView([position.coords.latitude, position.coords.longitude], 16)
-            marker.openPopup();
+            geoMarker.openPopup();
+            // geoMarker.setContent("testContent");
         });
     } else {
         //show a search bar
@@ -454,22 +458,9 @@ function addressGeocode(startCoords, endAddress) {
     })
 }
 
-function openSpecPopup(coords) {
-    for (i in privateMarkers) {
-        var markerLat = privateMarkers[i].geometry.coordinates[0];
-        var markerLng = privateMarkers[i].geometry.coordinates[1];
-        // console.log()
-        if (coords[1] === markerLat) {
-            if (coords[0] === markerLng) {
-                privateMarkers[i].openPopup();
-            }
-        }
-    }
-}
-
 function showDirections(startCoords, endCoords) {
     console.log("routing from: " + startCoords + "to: " + endCoords);
-    openSpecPopup(endCoords);
+    // openSpecPopup(endCoords);
     var stops = startCoords[1] + ", " + startCoords[0] + "; " + endCoords[1] + ", " + endCoords[0];
     var getPromise = $.get("http://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World/solve", {
         "token": accessToken,
@@ -484,18 +475,39 @@ function showDirections(startCoords, endCoords) {
         directionStr = valObj.directions[0].features;
         // console.log(directionStr);
         drawDirections(directionPoints);
-
+        changeWaypointText(directionStr);
     });
+}
+
+function changeWaypointText(directions) {
+    // console.log(Object.keys(directions));
+    customString = "";
+    for (var i = 0; i < Object.keys(directions).length; i++) {
+        directions[i].attributes.text.replace(/Location 2/i, "diestination");
+        customString += "<b>" + i + "</b>: " + directions[i].attributes.text + "<br>";
+        console.log(directions[i].attributes.text);
+    }
+
+    if (customWaypoint != undefined) {
+        customWaypoint.getPopup().setContent(customString);
+    } else if (geoMarker.getPopup() != undefined) {
+        geoMarker.getPopup().setContent(customString);
+    }
+    // console.log(geoMarker.getPopup());
 }
 
 function clearDirections() {
     for (var i = 0; i < directionLayers.length; i++) {
         __map.removeLayer(directionLayers[i]);
     }
+    if (customWaypoint != undefined) {
+        __map.removeLayer(customWaypoint);
+        customWaypoint = undefined;    
+    }
 }
 
 function drawDirections(points) {
-    clearDirections();
+    // clearDirections();
     // console.log(points);
     for (var i = 0; i < points.length - 1; i++) {
         var pointA = new L.LatLng(points[i][1], points[i][0]);
@@ -517,17 +529,35 @@ function fetchDirections(startCoords, endAddress) { //helper function since this
 }
 
 function onMapClick(e) {
-    var popup = L.popup();
-    popup.setLatLng(e.latlng);
+    if (customWaypoint != undefined) { //we've made one before
+        console.log(customWaypoint);
+        if (typeof(customWaypoint._latlng)!='undefined') { 
+            //popup is open
+            showDirections([customWaypoint._latlng.lat,customWaypoint._latlng.lng], [e.latlng.lat, e.latlng.lng]);
+        }
+        else {
+            //popup is closed
+            // so we can make a new one
+            makeCustomWaypointPopup(e);
+        }
+    } else {
+        //it's never existed so we can make a new one
+        makeCustomWaypointPopup(e);
+    }
+
+    
+}
+
+function makeCustomWaypointPopup(e) {
+    customWaypoint = L.marker([e.latlng.lat, e.latlng.lng]).addTo(__map);
     var position = { //this is hideous oh my god but i didn't want to rewrite code so whatever it works
             coords: {
                 latitude: e.latlng.lat,
                 longitude: e.latlng.lng
             }
         }
-        // console.log(position);
-    popup.setContent("<b><center>This is your custom waypoint!</center></b><br> The <b>nearest private</b> recycling location is " + findNearestMarker(position, privateMarkers) + "The <b>nearest municipal</b> recycling location is " + findNearestMarker(position, municipalMarkers));
-    popup.openOn(__map);
+    customWaypoint.bindPopup("<b><center>This is your custom waypoint at " + e.latlng.lat + "," + e.latlng.lng + "</center></b><br> The <b>nearest private</b> recycling location is " + findNearestMarker(position, privateMarkers) + "The <b>nearest municipal</b> recycling location is " + findNearestMarker(position, municipalMarkers));
+    customWaypoint.openPopup();
 }
 
 
