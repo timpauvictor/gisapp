@@ -345,7 +345,7 @@ function addClearDirButton() {
     L.easyButton('icon ion-android-close', function() {
         clearDirections();
     },
-    "Clear directions").addTo(__map);
+    "Clear directions and custom waypoint").addTo(__map);
 }
 
 function addFindMeButton() {
